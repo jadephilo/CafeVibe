@@ -5,25 +5,98 @@ import mapboxgl from "mapbox-gl";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
-export default function MapView() {
+type UserStatus = {
+  id: string;
+  nickname: string;
+  place_name: string;
+  lat: number;
+  lng: number;
+  mood: string | null;
+  activity: string | null;
+  open_to_social: boolean | null;
+  discord_url: string | null;
+};
+
+export default function MapView({ users }: { users: UserStatus[] }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    mapRef.current = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: [-118.2437, 34.0522],
       zoom: 11,
     });
 
+    map.addControl(new mapboxgl.NavigationControl());
+
+    mapRef.current = map;
+
     return () => {
-      mapRef.current?.remove();
+      markersRef.current.forEach((marker) => marker.remove());
+      markersRef.current = [];
+      map.remove();
       mapRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+users.forEach((user) => {
+  const popupHtml = `
+    <div style="min-width:220px">
+      <div style="font-weight:600;margin-bottom:8px;">${user.nickname}</div>
+      <div>📍 ${user.place_name}</div>
+      <div>😊 ${user.mood ?? ""}</div>
+      <div>📖 ${user.activity ?? ""}</div>
+      <div>${user.open_to_social ? "🟣 open to social" : "⚪ quiet mode"}</div>
+      ${
+        user.discord_url
+          ? `<div style="margin-top:10px;"><a href="${user.discord_url}" target="_blank">Join Discord</a></div>`
+          : ""
+      }
+    </div>
+  `;
+
+  const el = document.createElement("div");
+  el.style.width = "24px";
+  el.style.height = "24px";
+  el.style.borderRadius = "999px";
+  el.style.cursor = "pointer";
+  el.style.background = "white";
+  el.style.display = "flex";
+  el.style.alignItems = "center";
+  el.style.justifyContent = "center";
+  el.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+
+  const inner = document.createElement("div");
+  inner.style.width = "14px";
+  inner.style.height = "14px";
+  inner.style.borderRadius = "999px";
+  inner.style.background = user.open_to_social ? "#ff2f92" : "#6b7280";
+
+  el.appendChild(inner);
+
+  if (user.open_to_social) {
+    el.style.boxShadow = "0 0 0 5px rgba(255,47,146,0.18), 0 4px 12px rgba(0,0,0,0.2)";
+  }
+
+  const marker = new mapboxgl.Marker({ element: el })
+    .setLngLat([user.lng, user.lat])
+    .setPopup(new mapboxgl.Popup({ offset: 20 }).setHTML(popupHtml))
+    .addTo(mapRef.current!);
+
+  markersRef.current.push(marker);
+});
+  }, [users]);
 
   return <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />;
 }

@@ -13,6 +13,9 @@ export default function PostStatusForm({
   const [placeName, setPlaceName] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [openToSocial, setOpenToSocial] = useState(false);
+const [discordUsername, setDiscordUsername] = useState("");
+const [showTooltip, setShowTooltip] = useState(false);
 
   return (
     <form action={action} style={{ display: "grid", gap: 16 }}>
@@ -70,10 +73,59 @@ export default function PostStatusForm({
       </label>
 
       {/* Open to social */}
-      <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <input name="open_to_social" type="checkbox" />
-        Open to social
-      </label>
+      <div style={{ position: "relative" }}>
+  <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <input
+      name="open_to_social"
+      type="checkbox"
+      checked={openToSocial}
+      onChange={(e) => setOpenToSocial(e.target.checked)}
+    />
+
+    <span
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      style={{ cursor: "help" }}
+    >
+      Open to social
+    </span>
+  </label>
+
+  {showTooltip && (
+    <div
+      style={{
+        position: "absolute",
+        top: "100%",
+        left: 0,
+        marginTop: 6,
+        background: "#111",
+        color: "white",
+        padding: "8px 10px",
+        borderRadius: 8,
+        fontSize: 12,
+        width: 220,
+        lineHeight: 1.4,
+        zIndex: 10,
+      }}
+    >
+      If enabled, you can share your discord username. Other users may reach out to you to chat in discord or study together.
+    </div>
+  )}
+</div>
+
+{openToSocial && (
+  <label>
+    Your Discord username
+    <input
+      name="discord_username"
+      value={discordUsername}
+      onChange={(e) => setDiscordUsername(e.target.value)}
+      placeholder="username#1234"
+      style={inputStyle}
+      required
+    />
+  </label>
+)}
 
       {/* Submit */}
       <button type="submit" style={buttonStyle}>

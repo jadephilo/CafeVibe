@@ -16,12 +16,20 @@ type UserStatus = {
   work_today: string | null;
   open_to_social: boolean | null;
   discord_url: string | null;
+  discord_username: string | null;
 };
 
 export default function MapView({ users }: { users: UserStatus[] }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const rowStyle = `
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:6px;
+  line-height:1.2;
+`;
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -52,29 +60,59 @@ export default function MapView({ users }: { users: UserStatus[] }) {
     markersRef.current = [];
 
 users.forEach((user) => {
-  const popupHtml = `
-    <div style="min-width:220px">
-      <div style="font-weight:600;margin-bottom:8px;">${user.nickname}</div>
-      <div>📍 ${user.place_name}</div>
-      <div>😊 ${user.mood ?? ""}</div>
-      <div>📖 ${user.work_today ?? ""}</div>
-      <div>${user.open_to_social ? "🟣 open to social" : "⚪ quiet mode"}</div>
+const popupHtml = `
+  <div style="min-width:220px">
 
-      <div style="margin-top:12px;">
-        <a href="${DISCORD_URL}" target="_blank" style="
-          display:inline-block;
-          padding:8px 12px;
-          background:#5865F2;
-          color:white;
-          border-radius:8px;
-          text-decoration:none;
-          font-weight:600;
-        ">
-          Join study room
-        </a>
-      </div>
+    <div style="font-weight:600;margin-bottom:8px;">
+      ${user.nickname}
     </div>
-  `;
+
+    <div style="${rowStyle}">
+      <span>📍</span>
+      <span>${user.place_name}</span>
+    </div>
+
+    <div style="${rowStyle}">
+      <span>😊</span>
+      <span>${user.mood ?? ""}</span>
+    </div>
+
+    <div style="${rowStyle}">
+      <span>📖</span>
+      <span>${user.work_today ?? ""}</span>
+    </div>
+
+    <div style="${rowStyle}">
+      <span>${user.open_to_social ? "🟣" : "⚪"}</span>
+      <span>${user.open_to_social ? "open to social" : "quiet mode"}</span>
+    </div>
+
+    ${
+      user.open_to_social && user.discord_username
+        ? `<div style="${rowStyle}">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="#5865F2">
+    <path d="M20 4a16.3 16.3 0 0 0-4-1.2l-.2.4a15.4 15.4 0 0 0-7.6 0L8 2.8A16.3 16.3 0 0 0 4 4C1.6 7.6.8 11.1 1.2 14.6A16.5 16.5 0 0 0 6 17l.8-1.3a10.7 10.7 0 0 1-1.7-.8l.4-.3a12 12 0 0 0 10.9 0l.4.3a10.7 10.7 0 0 1-1.7.8l.8 1.3a16.5 16.5 0 0 0 4.8-2.4C23.2 11.1 22.4 7.6 20 4zM9.5 13.2c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7zm5 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7z"/>
+  </svg>
+  <span>${user.discord_username}</span>
+</div>`
+        : ""
+    }
+
+    <div style="margin-top:12px;">
+      <a href="${DISCORD_URL}" target="_blank" style="
+        display:inline-block;
+        padding:8px 12px;
+        background:#5865F2;
+        color:white;
+        border-radius:8px;
+        text-decoration:none;
+        font-weight:600;
+      ">
+        Join study room
+      </a>
+    </div>
+  </div>
+`;
 
   const el = document.createElement("div");
   el.style.width = "24px";

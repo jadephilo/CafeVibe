@@ -13,6 +13,7 @@ async function createStatus(formData: FormData) {
   const discord_url = String(formData.get("discord_url") || "").trim();
   const open_to_social = formData.get("open_to_social") === "on";
   const work_today = String(formData.get("work_today") || "").trim();
+  const discord_username = String(formData.get("discord_username") || "").trim();
 
 if (!nickname || !place_name || !work_today || Number.isNaN(lat) || Number.isNaN(lng)) {
   throw new Error("Please complete all required fields.");
@@ -26,7 +27,7 @@ const { error } = await supabase.from("user_statuses").insert({
   mood,
   work_today,
   open_to_social,
-  discord_url: null,
+  discord_username: open_to_social ? discord_username : null,
 });
 
   if (error) {

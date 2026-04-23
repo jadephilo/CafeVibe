@@ -15,6 +15,11 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -31,11 +36,15 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
 
     map.addControl(new mapboxgl.NavigationControl());
 
+    if (lat && lng) {
+      markerRef.current = new mapboxgl.Marker()
+        .setLngLat([Number(lng), Number(lat)])
+        .addTo(map);
+    }
+
     map.on("click", (e) => {
       const newLng = e.lngLat.lng.toFixed(6);
       const newLat = e.lngLat.lat.toFixed(6);
-
-      onChange(newLat, newLng);
 
       if (markerRef.current) {
         markerRef.current.setLngLat([Number(newLng), Number(newLat)]);
@@ -44,22 +53,41 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
           .setLngLat([Number(newLng), Number(newLat)])
           .addTo(map);
       }
-    });
 
-    if (lat && lng) {
-      markerRef.current = new mapboxgl.Marker()
-        .setLngLat([Number(lng), Number(lat)])
-        .addTo(map);
-    }
+      onChangeRef.current(newLat, newLng);
+    });
 
     mapRef.current = map;
 
     return () => {
       markerRef.current?.remove();
+      markerRef.current = null;
       map.remove();
       mapRef.current = null;
     };
-  }, [lat, lng, onChange]);
+  }, []);
 
-  return <div ref={mapContainerRef} style={{ width: "100%", height: 320, borderRadius: 12 }} />;
+  useEffect(() => {
+    if (!mapRef.current || !lat || !lng) return;
+
+    const lngNum = Number(lng);
+    const latNum = Number(lat);
+
+    if (Number.isNaN(lngNum) || Number.isNaN(latNum)) return;
+
+    if (markerRef.current) {
+      markerRef.current.setLngLat([lngNum, latNum]);
+    } else {
+      markerRef.current = new mapboxgl.Marker()
+        .setLngLat([lngNum, latNum])
+        .addTo(mapRef.current);
+    }
+  }, [lat, lng]);
+
+  return (
+    <div
+      ref={mapContainerRef}
+      style={{ width: "100%", height: 320, borderRadius: 12, overflow: "hidden" }}
+    />
+  );
 }

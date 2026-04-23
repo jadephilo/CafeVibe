@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
+const DISCORD_URL = "https://discord.gg/QC6H3pDxbz";
 
 type UserStatus = {
   id: string;
@@ -12,7 +13,7 @@ type UserStatus = {
   lat: number;
   lng: number;
   mood: string | null;
-  activity: string | null;
+  work_today: string | null;
   open_to_social: boolean | null;
   discord_url: string | null;
 };
@@ -56,13 +57,22 @@ users.forEach((user) => {
       <div style="font-weight:600;margin-bottom:8px;">${user.nickname}</div>
       <div>📍 ${user.place_name}</div>
       <div>😊 ${user.mood ?? ""}</div>
-      <div>📖 ${user.activity ?? ""}</div>
+      <div>📖 ${user.work_today ?? ""}</div>
       <div>${user.open_to_social ? "🟣 open to social" : "⚪ quiet mode"}</div>
-      ${
-        user.discord_url
-          ? `<div style="margin-top:10px;"><a href="${user.discord_url}" target="_blank">Join Discord</a></div>`
-          : ""
-      }
+
+      <div style="margin-top:12px;">
+        <a href="${DISCORD_URL}" target="_blank" style="
+          display:inline-block;
+          padding:8px 12px;
+          background:#5865F2;
+          color:white;
+          border-radius:8px;
+          text-decoration:none;
+          font-weight:600;
+        ">
+          Join study room
+        </a>
+      </div>
     </div>
   `;
 

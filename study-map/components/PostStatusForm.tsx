@@ -10,21 +10,35 @@ export default function PostStatusForm({
 }) {
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
+  const [placeName, setPlaceName] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   return (
     <form action={action} style={{ display: "grid", gap: 16 }}>
+      {/* Nickname */}
       <label>
         Nickname
         <input name="nickname" required style={inputStyle} />
       </label>
 
+      {/* Place name */}
       <label>
         Place name
-        <input name="place_name" required placeholder="Blue Bottle DTLA" style={inputStyle} />
+        <input
+          name="place_name"
+          required
+          placeholder="Blue Bottle DTLA"
+          style={inputStyle}
+        />
       </label>
 
+      {/* Map picker */}
       <div>
-        <div style={{ marginBottom: 8, fontWeight: 500 }}>Pick your location on the map</div>
+        <div style={{ marginBottom: 8, fontWeight: 500 }}>
+          Pick your location on the map
+        </div>
+
         <LocationPicker
           lat={lat}
           lng={lng}
@@ -35,29 +49,33 @@ export default function PostStatusForm({
         />
       </div>
 
+      {/* Hidden lat/lng */}
       <input name="lat" value={lat} type="hidden" required />
       <input name="lng" value={lng} type="hidden" required />
 
+      {/* Work today */}
       <label>
-        Mood
-        <input name="mood" placeholder="calm / focused / tired" style={inputStyle} />
+        What are you working on today?
+        <input name="work_today" required style={inputStyle} />
       </label>
 
+      {/* Mood */}
       <label>
-        Activity
-        <input name="activity" placeholder="reading / coding / writing" style={inputStyle} />
+        What's your mood today?
+        <input
+          name="mood"
+          placeholder="calm / focused / tired"
+          style={inputStyle}
+        />
       </label>
 
-      <label>
-        Discord URL
-        <input name="discord_url" placeholder="https://discord.gg/..." style={inputStyle} />
-      </label>
-
+      {/* Open to social */}
       <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <input name="open_to_social" type="checkbox" />
         Open to social
       </label>
 
+      {/* Submit */}
       <button type="submit" style={buttonStyle}>
         Submit
       </button>

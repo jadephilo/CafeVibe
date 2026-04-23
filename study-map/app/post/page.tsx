@@ -10,30 +10,30 @@ async function createStatus(formData: FormData) {
   const lat = Number(formData.get("lat"));
   const lng = Number(formData.get("lng"));
   const mood = String(formData.get("mood") || "").trim();
-  const activity = String(formData.get("activity") || "").trim();
   const discord_url = String(formData.get("discord_url") || "").trim();
   const open_to_social = formData.get("open_to_social") === "on";
+  const work_today = String(formData.get("work_today") || "").trim();
 
-  if (!nickname || !place_name || Number.isNaN(lat) || Number.isNaN(lng)) {
-    throw new Error("Missing required fields.");
-  }
+if (!nickname || !place_name || !work_today || Number.isNaN(lat) || Number.isNaN(lng)) {
+  throw new Error("Please complete all required fields.");
+}
 
-  const { error } = await supabase.from("user_statuses").insert({
-    nickname,
-    place_name,
-    lat,
-    lng,
-    mood,
-    activity,
-    open_to_social,
-    discord_url: discord_url || null,
-  });
+const { error } = await supabase.from("user_statuses").insert({
+  nickname,
+  place_name,
+  lat,
+  lng,
+  mood,
+  work_today,
+  open_to_social,
+  discord_url: null,
+});
 
   if (error) {
     throw new Error(error.message);
   }
 
-  redirect("/");
+  redirect("/posted");
 }
 
 export default function PostPage() {

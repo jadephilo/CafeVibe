@@ -146,5 +146,39 @@ const popupHtml = `
 });
   }, [users]);
 
-  return <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />;
+  return (
+  <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div
+      ref={mapContainerRef}
+      style={{ width: "100%", height: "100%" }}
+    />
+  </div>
+);
 }
+
+const primaryButtonStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "10px 14px",
+  borderRadius: 10,
+  background: "#111",
+  color: "white",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: 14,
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "10px 14px",
+  borderRadius: 10,
+  background: "white",
+  color: "#111",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: 14,
+  border: "1px solid #ddd",
+};
